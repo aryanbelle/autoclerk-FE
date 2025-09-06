@@ -1,0 +1,4 @@
+.env
+.env.example
+agent/client_secret.json
+agent/token.json
