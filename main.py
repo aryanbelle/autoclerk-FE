@@ -1,14 +1,20 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Request
+from fastapi import FastAPI, HTTPException, File, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 import os
 from dotenv import load_dotenv
 from groq import Groq
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 from pydantic import BaseModel
 import shutil
+import json
+import io
 from fastapi import File, UploadFile, HTTPException
+
+# Document parsing imports
+import PyPDF2
+from docx import Document
 
 # Import agent
 from agent import create_agent, AgentManager
@@ -40,6 +46,31 @@ groq_api_key = os.environ.get("GROQ_API_KEY")
 if not groq_api_key:
     raise RuntimeError("GROQ_API_KEY environment variable is not set")
 client = Groq(api_key=groq_api_key)
+
+# Document parsing functions
+def extract_text_from_pdf(file_content: bytes) -> str:
+    """Extract text from PDF file"""
+    try:
+        pdf_file = io.BytesIO(file_content)
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text() + "\n"
+        return text.strip()
+    except Exception as e:
+        return f"Error extracting PDF text: {str(e)}"
+
+def extract_text_from_docx(file_content: bytes) -> str:
+    """Extract text from DOCX file"""
+    try:
+        docx_file = io.BytesIO(file_content)
+        doc = Document(docx_file)
+        text = ""
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + "\n"
+        return text.strip()
+    except Exception as e:
+        return f"Error extracting DOCX text: {str(e)}"
 
 
 
@@ -114,6 +145,96 @@ async def upload_document(file: UploadFile = File(...)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing document: {str(e)}")
+
+@app.post("/analyze-document")
+async def analyze_document_with_prompt(
+    file: UploadFile = File(...),
+    prompt: str = Form(...),
+    history: str = Form(default="[]")
+):
+    """
+    Enhanced document analysis endpoint that accepts both file and user prompt
+    for more targeted analysis.
+    """
+    try:
+        # Validate file type
+        allowed_types = ["text/plain", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+        if file.content_type not in allowed_types:
+            raise HTTPException(status_code=400, detail="File type not supported")
+
+        # Read and process file content
+        content = await file.read()
+        
+        # Parse content based on file type
+        if file.content_type == "text/plain":
+            document_text = content.decode("utf-8")
+        elif file.content_type == "application/pdf":
+            document_text = extract_text_from_pdf(content)
+        elif file.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            document_text = extract_text_from_docx(content)
+        else:
+            document_text = content.decode("utf-8", errors='ignore')
+        
+        # Parse history
+        try:
+            chat_history = json.loads(history)
+        except:
+            chat_history = []
+        
+        # Create enhanced system prompt for document analysis
+        system_prompt = f"""
+You are Autoclerk, an expert AI assistant specialized in comprehensive document analysis. 
+You provide detailed, insightful analysis of documents based on specific user requests.
+
+Document Analysis Guidelines:
+1. Read and understand the entire document thoroughly
+2. Focus on the user's specific request/question
+3. Provide structured, detailed analysis
+4. Include relevant quotes and specific references
+5. Offer actionable insights when applicable
+6. Highlight key findings, risks, opportunities, or important information
+7. Use professional, clear language
+
+Document filename: {file.filename}
+Document type: {file.content_type}
+"""
+        
+        # Build the conversation messages
+        messages = [{"role": "system", "content": system_prompt}]
+        
+        # Add chat history
+        for msg in chat_history:
+            messages.append(msg)
+        
+        # Add the current request with document
+        user_message = f"""
+User Request: {prompt}
+
+Document Content:
+{document_text[:8000]}  # Limit to avoid token limits
+
+Please provide a comprehensive analysis based on my request above.
+"""
+        
+        messages.append({"role": "user", "content": user_message})
+
+        # Call AI model
+        try:
+            chat_completion = client.chat.completions.create(
+                messages=messages,
+                model="openai/gpt-oss-20b",
+                max_tokens=2000,  # Allow for longer responses
+                temperature=0.1   # Lower temperature for more focused analysis
+            )
+            return {"response": chat_completion.choices[0].message.content}
+        except Exception as ai_e:
+            print(f"Error from AI model: {ai_e}")
+            raise HTTPException(status_code=500, detail=f"AI model error: {str(ai_e)}")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing document: {str(e)}")
 
 @app.post("/agent")
 async def agent_chat(request: ChatRequest):
