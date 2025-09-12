@@ -1,37 +1,89 @@
 # AutoClerk Backend
 
-Backend server for the AutoClerk application, which integrates with Google Docs and uses Groq LLM for document processing.
+Backend server for the AutoClerk application with Google Workspace integration (Docs, Sheets, Gmail) and Groq LLM for intelligent document processing.
 
-## Setup
+## Features
 
-1. Clone the repository
-2. Install dependencies:
-   ```
+- 🤖 AI-powered chat with Groq LLM
+- 📄 Google Docs integration (create, read, update, comment, search)
+- 📊 Google Sheets integration (create, read, update, add rows, search)
+- 📧 Gmail integration (coming soon)
+- 🔐 OAuth 2.0 authentication for Google services
+- 🛠️ Agent-based tool system for complex workflows
+
+## Quick Start
+
+1. **Install dependencies:**
+   ```bash
    pip install -r requirements.txt
    ```
-3. Set up environment variables:
-   - Copy `.env.example` to `.env`
-   - Add your Groq API key to the `.env` file
 
-4. Set up Google API credentials:
-   - Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
-   - Enable the Google Docs API for your project:
-     - Go to [Google Cloud Console API Library](https://console.cloud.google.com/apis/library)
-     - Search for "Google Docs API"
-     - Select the API and click "Enable"
-     - Wait a few minutes for the changes to propagate
-   - Create OAuth 2.0 credentials (OAuth client ID)
-     - Application type: Desktop application
-     - Name: AutoClerk (or any name you prefer)
-   - Download the credentials as JSON
-   - Rename the downloaded file to `client_secret.json` and place it in the `agent` directory
-   - When running the application for the first time, you'll be prompted to authorize access
-   - After successful authorization, a `token.json` file will be created in the `agent` directory for future use
+2. **Set up environment variables:**
+   ```bash
+   cp .env.example .env
+   # Add your Groq API key to the .env file
+   ```
 
-## Running the Server
+3. **Start the server:**
+   ```bash
+   python start_server.py
+   ```
 
-```
-python main.py
+4. **Authenticate with Google:**
+   - Visit: http://localhost:8000/oauth/login
+   - Complete the Google OAuth flow
+   - Check status: http://localhost:8000/oauth/status
+
+## OAuth Setup (Already Configured)
+
+The OAuth setup is already configured with the necessary credentials. The system will:
+
+1. **Automatically handle authentication** when you visit `/oauth/login`
+2. **Store credentials securely** in `token.json` for future use
+3. **Refresh tokens automatically** when they expire
+4. **Support all required scopes** for Docs, Sheets, and Gmail
+
+### Required Google APIs
+
+The following APIs are enabled for this project:
+- Google Docs API
+- Google Sheets API
+- Google Drive API (for file operations)
+- Gmail API (for future email features)
+
+## API Endpoints
+
+### Core Endpoints
+- `POST /chat` - Basic chat with Groq LLM
+- `POST /agent` - Agent chat with Google tools access
+- `POST /upload-document` - Document analysis
+
+### OAuth Endpoints
+- `GET /oauth/login` - Initiate Google OAuth flow
+- `GET /oauth/callback` - OAuth callback handler
+- `GET /oauth/status` - Check authentication status
+
+## Available Agent Tools
+
+### Google Docs Tools
+- `create_google_doc` - Create new documents
+- `read_google_doc` - Read document content
+- `update_google_doc` - Update document content
+- `add_comment_google_doc` - Add comments to documents
+- `search_google_docs` - Search for documents
+
+### Google Sheets Tools
+- `create_google_sheet` - Create new spreadsheets
+- `read_google_sheet` - Read spreadsheet data
+- `update_google_sheet` - Update spreadsheet content
+- `add_row_google_sheet` - Add new rows
+- `search_google_sheets` - Search for spreadsheets
+
+## Testing OAuth
+
+Run the test script to check your authentication status:
+```bash
+python test_oauth.py
 ```
 
 ## Features

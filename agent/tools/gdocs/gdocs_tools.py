@@ -9,15 +9,19 @@ from googleapiclient.errors import HttpError
 # Import the authentication module
 from ..google_auth import authenticate_google_api, DOCS_SCOPES
 
-# Initialize Google Docs service
-try:
-    # Get credentials and build service
-    creds = authenticate_google_api(DOCS_SCOPES)
-    docs_service = build('docs', 'v1', credentials=creds)
-    print("✅ Google Docs service ready!")
-except Exception as e:
-    print(f"❌ Failed to initialize Google Docs service: {str(e)}")
-    docs_service = None
+# Google Docs service will be initialized per request
+docs_service = None
+
+def get_docs_service():
+    """Get Google Docs service with current credentials"""
+    try:
+        creds = authenticate_google_api(DOCS_SCOPES)
+        if creds:
+            return build('docs', 'v1', credentials=creds)
+        return None
+    except Exception as e:
+        print(f"❌ Failed to initialize Google Docs service: {str(e)}")
+        return None
 
 # Tool Input Schemas
 class CreateDocInput(BaseModel):
@@ -48,9 +52,10 @@ class CreateGoogleDocTool(BaseTool):
 
     def _run(self, title: str, content: Optional[str] = None):
         try:
-            # Check if docs_service is available
+            # Get docs service with current credentials
+            docs_service = get_docs_service()
             if docs_service is None:
-                error_message = "Google Docs service is not initialized. Please check authentication."
+                error_message = "Google Docs service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -90,9 +95,10 @@ class ReadGoogleDocTool(BaseTool):
 
     def _run(self, document_id: str, include_formatting: bool = False):
         try:
-            # Check if docs_service is available
+            # Get docs service with current credentials
+            docs_service = get_docs_service()
             if docs_service is None:
-                error_message = "Google Docs service is not initialized. Please check authentication."
+                error_message = "Google Docs service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -142,9 +148,10 @@ class UpdateGoogleDocTool(BaseTool):
 
     def _run(self, document_id: str, content: str, replace_all: bool = False):
         try:
-            # Check if docs_service is available
+            # Get docs service with current credentials
+            docs_service = get_docs_service()
             if docs_service is None:
-                error_message = "Google Docs service is not initialized. Please check authentication."
+                error_message = "Google Docs service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -240,9 +247,10 @@ class AddCommentGoogleDocTool(BaseTool):
 
     def _run(self, document_id: str, content: str, start_index: int, end_index: int):
         try:
-            # Check if docs_service is available
+            # Get docs service with current credentials
+            docs_service = get_docs_service()
             if docs_service is None:
-                error_message = "Google Docs service is not initialized. Please check authentication."
+                error_message = "Google Docs service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -294,13 +302,15 @@ class SearchGoogleDocsTool(BaseTool):
 
     def _run(self, query: str, max_results: int = 10):
         try:
-            # Check if docs_service is available
+            # Get docs service with current credentials
+            docs_service = get_docs_service()
             if docs_service is None:
-                error_message = "Google Docs service is not initialized. Please check authentication."
+                error_message = "Google Docs service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
-            # Initialize Drive service using the same credentials
+            # Get credentials and initialize Drive service
+            creds = authenticate_google_api(DOCS_SCOPES)
             drive_service = build('drive', 'v3', credentials=creds)
             
             # Search for documents

@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "autoclerk-agent-tools",
+		"name": "AutoClerk Agent Tools",
+		"description": "Test collection for AutoClerk backend agent tools",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Check OAuth Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/oauth/status",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["oauth", "status"]
+						}
+					}
+				},
+				{
+					"name": "OAuth Debug Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/oauth/debug",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["oauth", "debug"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Google Docs Tools",
+			"item": [
+				{
+					"name": "Create Google Doc",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Create a new Google Doc titled 'Test Document from Postman' with content 'This is a test document created via AutoClerk API'\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Search Google Docs",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Search for Google Docs containing 'test'\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Read Google Doc",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Read the content of the Google Doc with ID: [REPLACE_WITH_ACTUAL_DOC_ID]\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Update Google Doc",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Update the Google Doc with ID [REPLACE_WITH_ACTUAL_DOC_ID] to add this content: 'Updated via AutoClerk API at $(date)'\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Add Comment to Google Doc",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Add a comment to the Google Doc with ID [REPLACE_WITH_ACTUAL_DOC_ID] from index 1 to 10 saying 'This is a test comment from AutoClerk'\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Google Sheets Tools",
+			"item": [
+				{
+					"name": "Create Google Sheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Create a new Google Sheet titled 'Test Spreadsheet from Postman' with headers: Name, Email, Phone, Department\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Search Google Sheets",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Search for Google Sheets containing 'test'\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Read Google Sheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Read data from Google Sheet with ID [REPLACE_WITH_ACTUAL_SHEET_ID] range A1:D10\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Update Google Sheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Update Google Sheet with ID [REPLACE_WITH_ACTUAL_SHEET_ID] range A2:D2 with values: John Doe, john@example.com, 555-1234, Engineering\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				},
+				{
+					"name": "Add Row to Google Sheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Add a new row to Google Sheet with ID [REPLACE_WITH_ACTUAL_SHEET_ID] in Sheet1 with values: Jane Smith, jane@example.com, 555-5678, Marketing\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/agent",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["agent"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Basic Chat (No Google Tools)",
+			"item": [
+				{
+					"name": "Basic Chat Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Hello! Can you help me with some basic questions?\",\n    \"history\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/chat",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["chat"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

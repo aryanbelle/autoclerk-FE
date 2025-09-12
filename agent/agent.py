@@ -24,6 +24,13 @@ from .tools.gsheets import (
     SearchGoogleSheetsTool
 )
 
+from .tools.gmail import (
+    SendGmailTool,
+    ReadGmailTool,
+    SearchGmailTool,
+    ListGmailTool
+)
+
 # Load environment variables
 load_dotenv()
 
@@ -82,8 +89,11 @@ class AgentManager:
             AddRowGoogleSheetTool(),
             SearchGoogleSheetsTool(),
             
-            # Add more tools here as they are implemented
-            # Gmail tools will be added here when implemented
+            # Gmail tools
+            SendGmailTool(),
+            ReadGmailTool(),
+            SearchGmailTool(),
+            ListGmailTool(),
         ]
         
         return tools

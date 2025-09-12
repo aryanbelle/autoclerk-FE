@@ -9,17 +9,31 @@ from googleapiclient.errors import HttpError
 # Import the authentication module
 from ..google_auth import authenticate_google_api, SHEETS_SCOPES
 
-# Initialize Google Sheets service
-try:
-    # Get credentials and build service
-    creds = authenticate_google_api(SHEETS_SCOPES)
-    sheets_service = build('sheets', 'v4', credentials=creds)
-    drive_service = build('drive', 'v3', credentials=creds)
-    print("✅ Google Sheets service ready!")
-except Exception as e:
-    print(f"❌ Failed to initialize Google Sheets service: {str(e)}")
-    sheets_service = None
-    drive_service = None
+# Google Sheets services will be initialized per request
+sheets_service = None
+drive_service = None
+
+def get_sheets_service():
+    """Get Google Sheets service with current credentials"""
+    try:
+        creds = authenticate_google_api(SHEETS_SCOPES)
+        if creds:
+            return build('sheets', 'v4', credentials=creds)
+        return None
+    except Exception as e:
+        print(f"❌ Failed to initialize Google Sheets service: {str(e)}")
+        return None
+
+def get_drive_service():
+    """Get Google Drive service with current credentials"""
+    try:
+        creds = authenticate_google_api(SHEETS_SCOPES)
+        if creds:
+            return build('drive', 'v3', credentials=creds)
+        return None
+    except Exception as e:
+        print(f"❌ Failed to initialize Google Drive service: {str(e)}")
+        return None
 
 # Tool Input Schemas
 class CreateSheetInput(BaseModel):
@@ -54,9 +68,10 @@ class CreateGoogleSheetTool(BaseTool):
 
     def _run(self, title: str, headers: Optional[List[str]] = None):
         try:
-            # Check if sheets_service is available
-            if sheets_service is None or drive_service is None:
-                error_message = "Google Sheets service is not initialized. Please check authentication."
+            # Get sheets service with current credentials
+            sheets_service = get_sheets_service()
+            if sheets_service is None:
+                error_message = "Google Sheets service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -106,9 +121,10 @@ class ReadGoogleSheetTool(BaseTool):
 
     def _run(self, spreadsheet_id: str, range: str, include_headers: bool = True):
         try:
-            # Check if sheets_service is available
+            # Get sheets service with current credentials
+            sheets_service = get_sheets_service()
             if sheets_service is None:
-                error_message = "Google Sheets service is not initialized. Please check authentication."
+                error_message = "Google Sheets service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
                 
@@ -181,9 +197,10 @@ class UpdateGoogleSheetTool(BaseTool):
 
     def _run(self, spreadsheet_id: str, range: str, values: List[List[Any]], raw_input: bool = False):
         try:
-            # Check if sheets_service is available
+            # Get sheets service with current credentials
+            sheets_service = get_sheets_service()
             if sheets_service is None:
-                error_message = "Google Sheets service is not initialized. Please check authentication."
+                error_message = "Google Sheets service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
             
@@ -238,9 +255,10 @@ class AddRowGoogleSheetTool(BaseTool):
 
     def _run(self, spreadsheet_id: str, sheet_name: str, values: List[Any]):
         try:
-            # Check if sheets_service is available
+            # Get sheets service with current credentials
+            sheets_service = get_sheets_service()
             if sheets_service is None:
-                error_message = "Google Sheets service is not initialized. Please check authentication."
+                error_message = "Google Sheets service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
             
@@ -290,9 +308,10 @@ class SearchGoogleSheetsTool(BaseTool):
 
     def _run(self, query: str, max_results: int = 10):
         try:
-            # Check if drive_service is available
+            # Get drive service with current credentials
+            drive_service = get_drive_service()
             if drive_service is None:
-                error_message = "Google Drive service is not initialized. Please check authentication."
+                error_message = "Google Drive service is not available. Please authenticate first by visiting /oauth/login"
                 print(f"❌ {error_message}")
                 return error_message
             
