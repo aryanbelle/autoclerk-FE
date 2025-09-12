@@ -5,6 +5,9 @@ Backend server for the AutoClerk application with Google Workspace integration (
 ## Features
 
 - 🤖 AI-powered chat with Groq LLM
+- 📄 **Advanced Document Analysis**: PDF, DOCX, and TXT file processing with AI
+- 🔍 **Smart Document Parsing**: Extract text from multiple file formats
+- 💬 **Context-aware Analysis**: AI provides detailed insights based on user prompts
 - 📄 Google Docs integration (create, read, update, comment, search)
 - 📊 Google Sheets integration (create, read, update, add rows, search)
 - 📧 Gmail integration (coming soon)
@@ -56,7 +59,8 @@ The following APIs are enabled for this project:
 ### Core Endpoints
 - `POST /chat` - Basic chat with Groq LLM
 - `POST /agent` - Agent chat with Google tools access
-- `POST /upload-document` - Document analysis
+- `POST /upload-document` - Simple document analysis
+- `POST /analyze-document` - **Enhanced document analysis with user prompts**
 
 ### OAuth Endpoints
 - `GET /oauth/login` - Initiate Google OAuth flow
@@ -108,5 +112,30 @@ python test_oauth.py
   - Navigate to APIs & Services > Library
   - Search for "Google Docs API"
   - Select the API and click "Enable"
-  - Wait a few minutes for the changes to propagate before trying again# autoclerk-FE
-# autoclerk-FE
+  - Wait a few minutes for the changes to propagate before trying again
+
+## Document Analysis
+
+The enhanced document analysis feature supports:
+
+### Supported File Types
+- **PDF files** (.pdf) - Full text extraction
+- **Word documents** (.docx) - Complete content parsing  
+- **Text files** (.txt) - Direct processing
+
+### Analysis Features
+- **Smart file validation** with type and size checking
+- **Contextual analysis** based on user-provided prompts
+- **Professional AI responses** with detailed insights
+- **Chat history integration** for follow-up questions
+
+### Example Usage
+```python
+# Send file with prompt for analysis
+files = {'file': open('document.pdf', 'rb')}
+data = {
+    'prompt': 'Analyze this contract for potential risks',
+    'history': json.dumps(previous_chat_messages)
+}
+response = requests.post('/analyze-document', files=files, data=data)
+```
